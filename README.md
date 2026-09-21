@@ -15,7 +15,7 @@ Personal project for the intro programming course ("curso 0") of the Master in A
 ```
 Proyecto python/
 ├── requirements.txt              # Environment dependencies
-├── practica.ipynb                # Test/scratch notebook
+├── practica.ipynb                # Quick check that the DB/environment work
 ├── data/
 │   ├── proyecto.db               # SQLite database (not tracked in git)
 │   ├── seguros.csv               # Original insurance dataset
@@ -35,6 +35,7 @@ Clone the repository and create the virtual environment:
 ```
 python -m venv .venv
 .venv\Scripts\activate      # Windows
+source .venv/bin/activate   # macOS / Linux
 pip install -r requirements.txt
 ```
 
