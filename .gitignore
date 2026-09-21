@@ -1,0 +1,20 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Base de datos (se genera con scripts/init_db.py, no se versiona)
+data/*.db
+data/*.sqlite3
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
