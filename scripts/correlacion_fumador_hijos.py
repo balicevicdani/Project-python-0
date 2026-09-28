@@ -1,10 +1,9 @@
 """
-Estudia si existe correlacion entre ser fumador y no tener hijos,
-usando los datos de la tabla 'seguros'. Permite filtrar por sexo
+Funciones para estudiar la correlacion entre ser fumador y no tener hijos,
+usando los datos de una tabla de seguros. Permiten filtrar por sexo
 (por ejemplo, estudiar la correlacion solo entre las mujeres).
 
-Uso:
-    python scripts/correlacion_fumador_hijos.py
+Este script NO ejecuta nada al importarlo: solo define funciones.
 """
 import sqlite3
 from pathlib import Path
@@ -16,13 +15,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = BASE_DIR / "data" / "proyecto.db"
 
 
-def calcular_correlacion(db_path: Path = DB_PATH, sexo: str | None = None) -> dict:
+def calcular_correlacion(db_path: Path = DB_PATH, tabla: str = "seguros", sexo: str | None = None) -> dict:
     """
     Calcula la correlacion entre 'ser fumador' y 'no tener hijos'.
 
     Parametros:
         db_path: ruta a la base de datos.
-        sexo: si se indica ("female" o "male"), filtra la tabla 'seguros'
+        tabla: nombre de la tabla de origen.
+        sexo: si se indica ("female" o "male"), filtra la tabla
               a ese sexo antes de calcular la correlacion. Si es None,
               usa todos los registros.
 
@@ -38,7 +38,7 @@ def calcular_correlacion(db_path: Path = DB_PATH, sexo: str | None = None) -> di
         - chi2, p_valor: resultado del test de independencia chi-cuadrado
     """
     conn = sqlite3.connect(db_path)
-    df = pd.read_sql_query("SELECT sex, smoker, children FROM seguros", conn)
+    df = pd.read_sql_query(f"SELECT sex, smoker, children FROM {tabla}", conn)
     conn.close()
 
     if sexo is not None:
@@ -63,6 +63,7 @@ def calcular_correlacion(db_path: Path = DB_PATH, sexo: str | None = None) -> di
 
 
 def imprimir_resultado(titulo: str, resultado: dict):
+    """Muestra por pantalla, de forma legible, el resultado de calcular_correlacion()."""
     print(f"--- {titulo} (n = {resultado['n']}) ---")
     print("Tabla de contingencia (filas=fumador, columnas=sin_hijos):")
     print(resultado["tabla_contingencia"])
@@ -75,18 +76,3 @@ def imprimir_resultado(titulo: str, resultado: dict):
     else:
         print("=> No hay evidencia suficiente de asociacion (p >= 0.05).")
     print()
-
-
-def main():
-    # Con todos los registros
-    imprimir_resultado("Todos los registros", calcular_correlacion())
-
-    # Solo mujeres
-    imprimir_resultado("Solo mujeres", calcular_correlacion(sexo="female"))
-
-    # Solo hombres (para comparar)
-    imprimir_resultado("Solo hombres", calcular_correlacion(sexo="male"))
-
-
-if __name__ == "__main__":
-    main()
