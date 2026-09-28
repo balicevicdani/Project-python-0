@@ -1,9 +1,7 @@
-# Versiones exactas probadas en el entorno del proyecto (Python 3.14)
+# Versiones exactas probadas en el entorno del proyecto (Python 3.14).
+# numpy 2.5 y scipy 1.18 necesitan Python 3.12 o superior.
 pandas==3.0.5
 numpy==2.5.2
 matplotlib==3.11.1
 scipy==1.18.1
 ipykernel==7.3.0
-
-# Para abrir los notebooks fuera de VS Code (Jupyter Notebook / JupyterLab)
-jupyter

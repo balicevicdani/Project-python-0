@@ -1,42 +1,48 @@
-# Python Project — Intro Course (Master in Actuarial Sciences, UC3M)
+# Proyecto Python — Curso 0 (Máster en Ciencias Actuariales, UC3M)
 
-Personal project for the intro programming course ("curso 0") of the Master in Actuarial Sciences at UC3M. It works through a complete practical case: setting up a reproducible environment, downloading a public dataset from GitHub, storing it in a SQLite database and running a first statistical analysis relevant to actuarial work.
+Proyecto personal para el curso 0 de programación del Máster en Ciencias Actuariales de la UC3M. Recorre un caso práctico completo: montar un entorno reproducible, descargar un dataset público desde GitHub, guardarlo en una base de datos SQLite, consultarlo con SQL y hacer un primer análisis estadístico con interés actuarial.
 
-## Project structure
+## Estructura
 
-The project is **modular**: generic, reusable functions live in `scripts/`, and the analysis itself is developed and documented in the notebooks inside `notebooks/`.
+El proyecto es **modular**: las funciones genéricas y reutilizables están en `scripts/`, y el análisis se desarrolla y documenta en los notebooks de `notebooks/`.
 
 ```
-Proyecto python/
-├── requirements.txt          # Environment dependencies (exact versions)
+Project-python-0/
+├── requirements.txt          # Dependencias del entorno (versiones exactas)
 ├── data/
-│   ├── seguros.csv           # Dataset (downloaded from GitHub; local copy as fallback)
-│   ├── proyecto.db           # SQLite database (generated, not tracked in git)
-│   └── graficos.pdf          # All charts in one PDF (generated, not tracked in git)
+│   ├── seguros.csv           # Dataset (copia exacta del original de GitHub)
+│   ├── proyecto.db           # Base de datos SQLite (se genera, no se versiona)
+│   └── graficos.pdf          # Todos los gráficos en un PDF (se genera, no se versiona)
 ├── scripts/
 │   ├── __init__.py
-│   └── funciones.py          # All reusable functions, organised in sections
-└── notebooks/
-    ├── analisis.ipynb        # Main analysis: imports the functions and runs everything
-    └── practica.ipynb        # Quick check that the database/environment work
+│   └── funciones.py          # Todas las funciones reutilizables, organizadas por secciones
+├── notebooks/
+│   ├── analisis.ipynb        # Análisis principal: importa las funciones y lo ejecuta todo
+│   └── practica.ipynb        # Comprobación rápida de que la base de datos y el entorno funcionan
+└── tests/
+    └── test_funciones.py     # Pruebas automáticas de las funciones
 ```
 
-`scripts/funciones.py` only **defines** functions: importing it doesn't run anything or print anything. Every function receives its data, paths and table/column names as parameters, so it can be reused with other databases, variables or future projects. For a project of this size a single script with well-separated sections is enough; it can be split into several scripts as it grows.
+`scripts/funciones.py` solo **define** funciones: importarlo no ejecuta ni imprime nada. Todas reciben los datos, las rutas y los nombres de tablas o columnas como parámetros, así que sirven para otras bases de datos, variables o proyectos.
 
-| Section | Function | What it does |
+| Sección | Función | Qué hace |
 |---|---|---|
-| 1. Data | `descargar_csv(url, ruta_destino)` | Downloads a CSV from a URL (e.g. GitHub) and saves it locally |
-| | `cargar_csv_en_db(ruta_csv, ruta_db, nombre_tabla)` | Stores a CSV as a table in a SQLite database |
-| | `leer_tabla(ruta_db, nombre_tabla, columnas=None)` | Reads a table (or some columns) as a DataFrame |
-| 2. Visualisation | `histograma(datos, ancho_banda=None, titulo=None, ...)` | Histogram of any numeric column; returns `(fig, ax)` |
-| | `guardar_figuras_pdf(figuras, ruta_pdf)` | Saves a list of figures into a single PDF, one per page |
-| 3. Statistics | `tabla_contingencia(df, var_filas, var_columnas)` | Contingency table of two categorical variables (`pd.crosstab`) |
-| | `test_asociacion(df, var1, var2)` | Chi-square test of independence + phi coefficient for 2×2 tables |
-| | `resumen_asociacion(resultado)` | One-row summary of a test, to compare several groups |
+| 1. Datos | `descargar_csv(url, ruta_destino)` | Descarga un CSV de una URL (p. ej. GitHub) y guarda una copia exacta; si la descarga falla, no toca la copia local |
+| | `cargar_csv_en_db(ruta_csv, ruta_db, nombre_tabla)` | Guarda un CSV como tabla de una base de datos SQLite |
+| | `listar_tablas(ruta_db)` | Nombres de las tablas de la base de datos |
+| | `leer_tabla(ruta_db, nombre_tabla, columnas=None)` | Lee una tabla (o algunas columnas) como DataFrame |
+| 2. SQL | `consultar(ruta_db, sql, parametros)` | Ejecuta cualquier consulta SQL y devuelve un DataFrame |
+| | `media_por_grupo(ruta_db, tabla, var_numerica, var_grupo)` | `GROUP BY`: n, media, mínimo y máximo por grupo |
+| 3. Visualización | `histograma(datos, ancho_banda=None, titulo=None, ...)` | Histograma de cualquier columna numérica; devuelve `(fig, ax)` |
+| | `boxplot_por_grupo(df, var_numerica, var_grupo)` | Diagrama de cajas por grupos; devuelve `(fig, ax)` |
+| | `guardar_figuras_pdf(figuras, ruta_pdf)` | Guarda una lista de figuras en un único PDF, una por página |
+| 4. Estadística | `tabla_contingencia(df, var_filas, var_columnas)` | Tabla de contingencia de dos variables categóricas (`pd.crosstab`) |
+| | `test_asociacion(df, var1, var2)` | Test chi-cuadrado de independencia + V de Cramér + phi (tablas 2×2) |
+| | `resumen_asociacion(resultado)` | Resumen en una fila de un test, para comparar varios grupos |
 
-## How to reproduce it
+## Cómo reproducirlo
 
-Requirements: **Python 3.11 or newer** (developed and tested with Python 3.14).
+Requisitos: **Python 3.12 o superior** (desarrollado y probado con Python 3.14).
 
 ```
 python -m venv .venv
@@ -45,32 +51,43 @@ source .venv/bin/activate   # macOS / Linux
 pip install -r requirements.txt
 ```
 
-Open the **project folder** in your editor (in VS Code: *File → Open Folder*), select the `.venv` kernel and run `notebooks/analisis.ipynb` top to bottom. It will:
+Abre la **carpeta del proyecto** en el editor (en VS Code: *File → Open Folder*), selecciona el kernel `.venv` y ejecuta `notebooks/analisis.ipynb` de principio a fin (*Run All*). El notebook:
 
-1. Download the dataset from GitHub (or use the local copy if there is no connection) and load it into `data/proyecto.db`.
-2. Explore the data.
-3. Plot histograms of age, BMI and insurance cost.
-4. Study the association between being a smoker and having no children (contingency table, chi-square test and phi coefficient), overall and by sex.
-5. Save all charts into `data/graficos.pdf`.
+1. Descarga el dataset de GitHub (o usa la copia local si no hay conexión) y lo carga en `data/proyecto.db`.
+2. Explora los datos y comprueba su calidad (valores que faltan y filas duplicadas).
+3. Dibuja los histogramas de edad, BMI y coste médico.
+4. Compara el coste médico según las características del asegurado con consultas SQL (`GROUP BY`).
+5. Estudia la asociación entre ser fumador y no tener hijos (tabla de contingencia, test chi-cuadrado, phi y V de Cramér), en total y por sexo.
+6. Guarda todos los gráficos en `data/graficos.pdf`.
+
+Para ejecutar las pruebas automáticas (no necesitan nada más que lo de `requirements.txt`), desde la carpeta raíz:
+
+```
+python -m unittest discover -s tests -v
+```
+
+Para abrir los notebooks fuera de VS Code hace falta instalar además Jupyter: `pip install jupyterlab`.
 
 ## Dataset
 
-Public "Medical Cost Personal Datasets" (1,338 insured individuals), from [stedy/Machine-Learning-with-R-datasets](https://github.com/stedy/Machine-Learning-with-R-datasets).
+*Medical Cost Personal Datasets* (1.338 asegurados), del libro *Machine Learning with R* de Brett Lantz, publicado en [stedy/Machine-Learning-with-R-datasets](https://github.com/stedy/Machine-Learning-with-R-datasets).
 
-| Column     | Description                          |
-|------------|--------------------------------------|
-| `age`      | Age of the insured person            |
-| `sex`      | Sex (male / female)                  |
-| `bmi`      | Body mass index                      |
-| `children` | Number of dependent children         |
-| `smoker`   | Whether the person smokes (yes / no) |
-| `region`   | Residential region in the US         |
-| `charges`  | Medical insurance cost               |
+| Columna    | Descripción |
+|------------|-------------|
+| `age`      | Edad del asegurado |
+| `sex`      | Sexo (female / male) |
+| `bmi`      | Índice de masa corporal |
+| `children` | Número de hijos a cargo |
+| `smoker`   | Si fuma (yes / no) |
+| `region`   | Región de residencia en EE. UU. |
+| `charges`  | Coste médico anual facturado al seguro (USD); no es la prima |
 
-## Notes
+No tiene valores que falten. Tiene una fila duplicada (filas 195 y 581), que se mantiene en el análisis porque sin un identificador de cliente no se puede saber si es un error.
 
-This project was developed as a personal exercise, with help from Claude to work through Python, SQL and basic statistics questions along the way.
+## Notas
 
-## Author
+Proyecto desarrollado como ejercicio personal, con ayuda de Claude para resolver dudas de Python, SQL y estadística básica.
 
-Daniel Balicevic Celdrán — Master in Actuarial Sciences, UC3M
+## Autor
+
+Daniel Balicevic Celdrán — Máster en Ciencias Actuariales, UC3M

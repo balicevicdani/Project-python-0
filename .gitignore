@@ -11,11 +11,11 @@ __pycache__/
 # Jupyter
 .ipynb_checkpoints/
 
-# Base de datos (se genera con scripts/init_db.py, no se versiona)
+# Base de datos (la genera notebooks/analisis.ipynb, no se versiona)
 data/*.db
 data/*.sqlite3
 
-# Graficos generados (se generan con notebooks/analisis.ipynb, no se versionan)
+# Graficos (los genera notebooks/analisis.ipynb, no se versionan)
 data/*.pdf
 
 # Archivos del sistema
