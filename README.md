@@ -1,44 +1,42 @@
 # Python Project — Intro Course (Master in Actuarial Sciences, UC3M)
 
-Personal project for the intro programming course ("curso 0") of the Master in Actuarial Sciences at UC3M. The goal is to get familiar with Python by working through a complete practical case: setting up an environment, creating a database, loading a real dataset, and running a first statistical analysis on it.
-
-## What the project includes
-
-- A Python virtual environment with the required libraries (pandas, numpy, matplotlib, scipy, jupyter...).
-- A SQLite database (`data/proyecto.db`) with two tables:
-  - `alumnos`: a small example table used to practice basic queries.
-  - `seguros`: a public dataset of 1,338 insured individuals (age, sex, BMI, number of children, smoker status, region, and medical insurance charges), used to practice analysis relevant to actuarial work (relationship between risk variables and cost).
-- Reusable Python functions (in `scripts/`) to create the database, load the data, visualize it, and analyze it.
-- A notebook (in `notebooks/`) that imports those functions and runs the actual analysis, with the results shown inline.
+Personal project for the intro programming course ("curso 0") of the Master in Actuarial Sciences at UC3M. It works through a complete practical case: setting up a reproducible environment, downloading a public dataset from GitHub, storing it in a SQLite database and running a first statistical analysis relevant to actuarial work.
 
 ## Project structure
 
+The project is **modular**: generic, reusable functions live in `scripts/`, and the analysis itself is developed and documented in the notebooks inside `notebooks/`.
+
 ```
 Proyecto python/
-├── requirements.txt              # Environment dependencies
-├── practica.ipynb                # Quick check that the DB/environment work (run analisis.ipynb first)
+├── requirements.txt          # Environment dependencies (exact versions)
 ├── data/
-│   ├── proyecto.db               # SQLite database (not tracked in git)
-│   ├── seguros.csv               # Original insurance dataset
-│   └── graficos.pdf              # Charts generated from the notebook (not tracked in git)
-├── notebooks/
-│   └── analisis.ipynb            # Main analysis notebook: imports scripts/ functions and runs everything
-└── scripts/
-    ├── __init__.py                   # Makes scripts/ an importable package
-    ├── init_db.py                    # crear_base_de_datos(db_path=...): creates the 'alumnos' table
-    ├── cargar_seguros.py              # cargar_seguros(csv_path=..., db_path=..., tabla=...): loads a CSV into a table
-    ├── histograma_edades.py           # histograma(columna=..., tabla=..., ancho_banda=...): builds a histogram, returns (fig, ax)
-    ├── correlacion_fumador_hijos.py   # calcular_correlacion(sexo=...), imprimir_resultado(...): smoker/children correlation
-    └── consultar_db.py                # consultar_tabla(tabla=..., db_path=...): returns any table as a DataFrame
+│   ├── seguros.csv           # Dataset (downloaded from GitHub; local copy as fallback)
+│   ├── proyecto.db           # SQLite database (generated, not tracked in git)
+│   └── graficos.pdf          # All charts in one PDF (generated, not tracked in git)
+├── scripts/
+│   ├── __init__.py
+│   └── funciones.py          # All reusable functions, organised in sections
+└── notebooks/
+    ├── analisis.ipynb        # Main analysis: imports the functions and runs everything
+    └── practica.ipynb        # Quick check that the database/environment work
 ```
 
-Scripts only **define** functions — they don't execute anything on their own. All the functions take their inputs as parameters (with sensible defaults), so they can be reused with different paths, tables or columns. The notebook is where those functions get called and the results (tables, plots, statistics) are actually produced and shown.
+`scripts/funciones.py` only **defines** functions: importing it doesn't run anything or print anything. Every function receives its data, paths and table/column names as parameters, so it can be reused with other databases, variables or future projects. For a project of this size a single script with well-separated sections is enough; it can be split into several scripts as it grows.
+
+| Section | Function | What it does |
+|---|---|---|
+| 1. Data | `descargar_csv(url, ruta_destino)` | Downloads a CSV from a URL (e.g. GitHub) and saves it locally |
+| | `cargar_csv_en_db(ruta_csv, ruta_db, nombre_tabla)` | Stores a CSV as a table in a SQLite database |
+| | `leer_tabla(ruta_db, nombre_tabla, columnas=None)` | Reads a table (or some columns) as a DataFrame |
+| 2. Visualisation | `histograma(datos, ancho_banda=None, titulo=None, ...)` | Histogram of any numeric column; returns `(fig, ax)` |
+| | `guardar_figuras_pdf(figuras, ruta_pdf)` | Saves a list of figures into a single PDF, one per page |
+| 3. Statistics | `tabla_contingencia(df, var_filas, var_columnas)` | Contingency table of two categorical variables (`pd.crosstab`) |
+| | `test_asociacion(df, var1, var2)` | Chi-square test of independence + phi coefficient for 2×2 tables |
+| | `resumen_asociacion(resultado)` | One-row summary of a test, to compare several groups |
 
 ## How to reproduce it
 
-Requirements: **Python 3.11 or newer** (the project was developed and tested with Python 3.14; pandas 3 needs at least 3.11).
-
-Clone the repository and create the virtual environment:
+Requirements: **Python 3.11 or newer** (developed and tested with Python 3.14).
 
 ```
 python -m venv .venv
@@ -47,34 +45,31 @@ source .venv/bin/activate   # macOS / Linux
 pip install -r requirements.txt
 ```
 
-Open `notebooks/analisis.ipynb` and run it top to bottom (it works whether Jupyter starts in the project root or in `notebooks/`). It will:
-1. Create the database and load the data (`crear_base_de_datos`, `cargar_seguros`).
-2. Query the `alumnos` table as a quick example (`consultar_tabla`).
-3. Show a histogram of insured ages (`histograma`).
-4. Compute the smoker / no-children correlation, overall and by sex (`calcular_correlacion`, `imprimir_resultado`).
-5. Save the charts into a single PDF (`data/graficos.pdf`) using `PdfPages`.
+Open the **project folder** in your editor (in VS Code: *File → Open Folder*), select the `.venv` kernel and run `notebooks/analisis.ipynb` top to bottom. It will:
 
-After that, `practica.ipynb` can be run as a quick check that the database is in place.
+1. Download the dataset from GitHub (or use the local copy if there is no connection) and load it into `data/proyecto.db`.
+2. Explore the data.
+3. Plot histograms of age, BMI and insurance cost.
+4. Study the association between being a smoker and having no children (contingency table, chi-square test and phi coefficient), overall and by sex.
+5. Save all charts into `data/graficos.pdf`.
 
-## Dataset used
+## Dataset
 
-The insurance dataset (`data/seguros.csv`) is the public "Medical Cost Personal Datasets" set, widely used in data science courses, with the following columns:
+Public "Medical Cost Personal Datasets" (1,338 insured individuals), from [stedy/Machine-Learning-with-R-datasets](https://github.com/stedy/Machine-Learning-with-R-datasets).
 
 | Column     | Description                          |
-|------------|---------------------------------------|
-| `age`      | Age of the insured person             |
-| `sex`      | Sex (male / female)                   |
-| `bmi`      | Body mass index                       |
-| `children` | Number of dependent children          |
-| `smoker`   | Whether the person smokes (yes / no)  |
-| `region`   | Residential region in the US          |
-| `charges`  | Medical insurance cost                |
+|------------|--------------------------------------|
+| `age`      | Age of the insured person            |
+| `sex`      | Sex (male / female)                  |
+| `bmi`      | Body mass index                      |
+| `children` | Number of dependent children         |
+| `smoker`   | Whether the person smokes (yes / no) |
+| `region`   | Residential region in the US         |
+| `charges`  | Medical insurance cost               |
 
 ## Notes
 
-The database file (`data/*.db`) and the generated PDF (`data/graficos.pdf`) are not tracked in git (see `.gitignore`); they're easily regenerated by running `notebooks/analisis.ipynb`.
-
-This project was developed as a personal exercise, with help from Claude to work through Python, SQL, and basic statistics questions along the way.
+This project was developed as a personal exercise, with help from Claude to work through Python, SQL and basic statistics questions along the way.
 
 ## Author
 
