@@ -44,6 +44,8 @@ def calcular_correlacion(db_path: Path = DB_PATH, tabla: str = "seguros", sexo: 
     if sexo is not None:
         df = df[df["sex"] == sexo]
 
+    df = df.copy()  # evita avisos de pandas al crear columnas nuevas
+
     df["fumador"] = (df["smoker"] == "yes").astype(int)
     df["sin_hijos"] = (df["children"] == 0).astype(int)
 

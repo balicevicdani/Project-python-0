@@ -16,7 +16,7 @@ Personal project for the intro programming course ("curso 0") of the Master in A
 ```
 Proyecto python/
 ├── requirements.txt              # Environment dependencies
-├── practica.ipynb                # Quick check that the DB/environment work
+├── practica.ipynb                # Quick check that the DB/environment work (run analisis.ipynb first)
 ├── data/
 │   ├── proyecto.db               # SQLite database (not tracked in git)
 │   ├── seguros.csv               # Original insurance dataset
@@ -24,6 +24,7 @@ Proyecto python/
 ├── notebooks/
 │   └── analisis.ipynb            # Main analysis notebook: imports scripts/ functions and runs everything
 └── scripts/
+    ├── __init__.py                   # Makes scripts/ an importable package
     ├── init_db.py                    # crear_base_de_datos(db_path=...): creates the 'alumnos' table
     ├── cargar_seguros.py              # cargar_seguros(csv_path=..., db_path=..., tabla=...): loads a CSV into a table
     ├── histograma_edades.py           # histograma(columna=..., tabla=..., ancho_banda=...): builds a histogram, returns (fig, ax)
@@ -35,6 +36,8 @@ Scripts only **define** functions — they don't execute anything on their own. 
 
 ## How to reproduce it
 
+Requirements: **Python 3.11 or newer** (the project was developed and tested with Python 3.14; pandas 3 needs at least 3.11).
+
 Clone the repository and create the virtual environment:
 
 ```
@@ -44,12 +47,14 @@ source .venv/bin/activate   # macOS / Linux
 pip install -r requirements.txt
 ```
 
-Open `notebooks/analisis.ipynb` and run it top to bottom. It will:
+Open `notebooks/analisis.ipynb` and run it top to bottom (it works whether Jupyter starts in the project root or in `notebooks/`). It will:
 1. Create the database and load the data (`crear_base_de_datos`, `cargar_seguros`).
 2. Query the `alumnos` table as a quick example (`consultar_tabla`).
 3. Show a histogram of insured ages (`histograma`).
 4. Compute the smoker / no-children correlation, overall and by sex (`calcular_correlacion`, `imprimir_resultado`).
 5. Save the charts into a single PDF (`data/graficos.pdf`) using `PdfPages`.
+
+After that, `practica.ipynb` can be run as a quick check that the database is in place.
 
 ## Dataset used
 
